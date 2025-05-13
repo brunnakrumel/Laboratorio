@@ -1,0 +1,83 @@
+---
+title: "Brunna Krumel"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: load-packages #nomes únicos 
+#| include: false # não incui o resultado do doc
+
+library(tidyverse) # pacote ggplot2 (gráfico)
+library(WDI) # pacote dos dados
+
+#BASE DE DADOS
+# dados em painel
+dadosvida <- WDI(country = 'all',
+                 indicator = 'SP.DYN.LE00.IN')
+# CORTE TRANSVERSAL
+dadosvida2023 <- WDI(country = 'all',
+                     indicator = 'SP.DYN.LE00.IN',
+                     start = 2023, end = 2023)
+# SÉRIE TEMPORAL
+dadosvidabr <- WDI(country = 'BR',
+                   indicator = 'SP.DYN.LE00.IN')
+```
+
+## GRÁFICO COM DADOS EM PAINEL
+
+O gráfico ilustra a evolução na expectativa de vida ao nascer ao longo dos anos, considerando dados de diversos paíse. Conseguimos ver que, no geral, as pessoas estão vivendo mais, o que reflete as melhorias em áreas como saúde, educação e qualidade de vida. Claro que existem diferenças entre os países, alguns avançaram mais rápido, outros ainda enfrentam desafios, mas no geral, o gráfico mostra que estamos indo na direção certa.
+
+```{r}
+#| label: dados em painel
+#| warning: false
+#| echo: false
+grafpainel <- ggplot(dadosvida, aes(x = year, y = SP.DYN.LE00.IN, color = country)) +
+  geom_jitter(alpha = 0.4, size = 2, width = 0.2, height = 0) +
+  labs(title = "Expectativa de Vida ao Nascer (Todos os Países)",
+       x = "Ano", y = "Expectativa de Vida (anos)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+print(grafpainel)
+```
+
+## GRÁFICO COM DADOS CORTES TRANSVERSAL
+
+O gráfico apresentado mostra a **expectativa de vida ao nascer no ano de 2023**, com base em dados de diferentes países. Essa visualização, construída a partir de um **corte transversal**, permite comparar como esse indicador varia entre as nações em um mesmo momento no tempo. Observa-se que, apesar de muitos países apresentarem altos níveis de expectativa de vida, ainda existem disparidades significativas, refletindo diferenças no acesso à saúde, qualidade de vida e desenvolvimento socioeconômico.
+
+```{r}
+#| label: cortes transversal #|
+#| warning: false #|
+#| echo: false 
+grafcorte <- ggplot(dadosvida2023, 
+                    mapping = aes(y = SP.DYN.LE00.IN, 
+                                  x = year)) +
+  geom_point() +
+  labs(title = "Expectativa de Vida ao Nascer em 2023", 
+       x = "Ano", y = "Expectativa de Vida (anos)")
+print(grafcorte)
+```
+
+## GRÁFICO COM DADOS SÉRIE TEMPORAL
+
+O gráfico resultante ilustra como a expectativa de vida ao nascer no Brasil evoluiu ao longo dos anos. A linha conecta os pontos de dados, mostrando as flutuações e tendências desse indicador. Esse tipo de visualização é útil para identificar períodos de crescimento ou declínio na expectativa de vida, possibilitando análises sobre os fatores que influenciaram essas mudanças.
+
+```{r}
+#| label: série temporal #| #|
+#| warning: false #| #|
+#| echo: false  
+library(ggplot2)
+library(gganimate)
+
+# Gráfico original com movimento adicionado
+grafserie <- ggplot(dadosvidabr, 
+                    mapping = aes(x = year, y = SP.DYN.LE00.IN)) +
+  geom_line(aes(group = 1), color = "red") +  # Corrigido aqui
+  labs(title = "Evolução da Expectativa de Vida ao Nascer no Brasil", 
+       x = "Ano", y = "Expectativa de Vida (anos)",
+       subtitle = "") +
+  transition_reveal(year)
+
+animate(grafserie, renderer = gifski_renderer(), duration = 6, fps = 10)
+```
