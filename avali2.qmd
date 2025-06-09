@@ -1,0 +1,72 @@
+---
+title: "Análise da Balança Comercial"
+format: html
+editor: visual
+---
+
+## 📈 Evolução das Exportações e Importações (1989–2025)
+
+### Anos 1990: Consolidação e Diversificação
+
+Nos anos 1990, Santa Catarina começou a consolidar sua posição no comércio exterior brasileiro. O estado diversificou suas exportações, destacando-se em setores como agropecuário, metalúrgico e têxtil. A carne suína e de frango, além de produtos como móveis e tecidos, passaram a representar uma parte significativa das vendas externas.
+
+### Anos 2000: Crescimento Sustentado
+
+Durante a década de 2000, Santa Catarina experimentou um crescimento contínuo nas exportações, impulsionado pela demanda global por alimentos e pela ampliação da capacidade produtiva local. O estado se tornou um dos maiores exportadores de carnes do Brasil, com destaque para a carne suína e de frango. Além disso, o setor metalúrgico e o de móveis continuaram a expandir suas vendas externas.
+
+### Anos 2010: Desafios e Recuperação
+
+A década de 2010 trouxe desafios econômicos, incluindo crises internas e externas, que afetaram o comércio exterior catarinense. No entanto, o estado demonstrou resiliência, adaptando-se às mudanças no mercado global e retomando o crescimento nas exportações, especialmente nos setores agropecuário e industrial.
+
+### 2020–2025: Desempenho Recorde e Superávits
+
+Nos últimos anos, Santa Catarina alcançou marcos históricos em suas exportações. Em 2024, o estado exportou US\$ 11,6 bilhões, representando um crescimento de 0,6% em relação a 2023. As carnes de aves e suínas, motores e geradores elétricos, soja e peças para motores de veículos foram os principais produtos exportados. Os principais destinos das exportações catarinenses foram os Estados Unidos, China e México.
+
+Em termos de importações, Santa Catarina também apresentou crescimento, alcançando US\$ 33,7 bilhões em 2024, um aumento de 17,4% em relação ao ano anterior. Os principais produtos importados foram cobre, automóveis e peças, semicondutores, produtos químicos e adubos.
+
+```{r}
+#| label: load-packages #nomes únicos 
+#| include: false # não incui o resultado do doc
+
+library(ggplot2)
+library(GetBCBData)
+library(scales)
+library(gganimate)
+library(gifski)
+library(transformr)
+
+my.id <- (cdi = 13083)				
+
+df.bcb <- gbcbd_get_series(id = my.id ,				
+                           first.date = '1989-01-01',				
+                           last.date = as.Date('2025-04-01'),				
+                           format.data = 'long',				
+                           use.memoise = TRUE,				
+                           cache.path = tempdir(), # use tempdir for cache folder				
+                           do.parallel = FALSE)	
+```
+
+```{r}
+#| label: dados em painel
+#| warning: false
+#| echo: false
+library(ggplot2)
+library(gganimate)
+library(gifski)
+library(transformr)
+
+p <- ggplot(df.bcb, aes(x = ref.date, y = value)) +
+  geom_line(color = "steelblue") +
+  geom_point(color = "red", size = 2) +			
+  labs(title = 'Saldo da balança comercial - SC',				
+       subtitle = paste0(min(df.bcb$ref.date), ' to ', max(df.bcb$ref.date)),		
+       x = '', y = 'Saldo da balança comercial - SC') +
+  theme_light() +
+  transition_reveal(ref.date)  # ESSENCIAL para que o gráfico seja animado
+
+# 4. Verificar se o objeto agora é animável
+class(p)
+p	
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
